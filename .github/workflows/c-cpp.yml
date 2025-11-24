@@ -1,0 +1,47 @@
+name: Build pycdc (CMake)
+
+on:
+  push:
+    branches: [ "main", "master" ] # Запуск при пуше в эти ветки
+  pull_request:
+    branches: [ "main", "master" ] # Запуск при создании PR
+
+jobs:
+  build:
+    # Используем Linux-раннер для компиляции (рекомендуется для C++)
+    runs-on: ubuntu-latest
+    
+    steps:
+    # 1. Получение исходного кода
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    # 2. Установка зависимостей (CMake и компилятор C++)
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake build-essential
+
+    # 3. Конфигурация проекта с помощью CMake
+    # Создает файлы сборки в папке 'build'
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake ..
+
+    # 4. Выполнение компиляции
+    - name: Build project
+      run: cmake --build build
+
+    # 5. Сохранение собранных файлов (опционально, но полезно)
+    # Это позволит вам скачать скомпилированные бинарники
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: pycdc-binaries-ubuntu
+        path: build/pycdc
+        # Если нужен и pycdas:
+        # path: | 
+        #   build/pycdc
+        #   build/pycdas
